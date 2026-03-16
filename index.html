@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Relatórios">
+<title>Meus Relatórios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a14; --surface: #12121f; --surface2: #1a1a2e;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+    --text: #eeeef5; --text2: rgba(238,238,245,0.55); --text3: rgba(238,238,245,0.3);
+    --accent: #7c6af7; --accent2: #a99bff; --accent-bg: rgba(124,106,247,0.12);
+  }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; top: -20vh; left: 50%; transform: translateX(-50%); width: 60vw; height: 60vw; background: radial-gradient(ellipse, rgba(124,106,247,0.08) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  .app-wrap { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+  header { padding: 20px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+  .logo-mark { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 38px; height: 38px; background: var(--accent-bg); border: 0.5px solid rgba(124,106,247,0.3); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text3); }
+  .header-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); background: var(--surface); border: 0.5px solid var(--border); border-radius: 20px; padding: 4px 10px; }
+  .search-wrap { padding: 16px 20px 0; }
+  .search-box { position: relative; }
+  .search-box svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); opacity: 0.3; }
+  .search-input { width: 100%; background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 11px 14px 11px 38px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: rgba(124,106,247,0.5); }
+  .cats { display: flex; gap: 7px; padding: 14px 20px 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .cats::-webkit-scrollbar { display: none; }
+  .cat-pill { background: var(--surface); border: 0.5px solid var(--border); color: var(--text2); font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all 0.18s; user-select: none; }
+  .cat-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .cat-pill:active { transform: scale(0.95); }
+  .count-row { padding: 14px 20px 4px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text3); letter-spacing: 0.3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; padding: 4px 20px 120px; }
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 18px; padding: 20px 14px 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 11px; transition: border-color 0.18s, background 0.18s, transform 0.18s; user-select: none; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; inset: 0; border-radius: 18px; background: radial-gradient(circle at 50% 0%, var(--card-color, var(--accent)), transparent 65%); opacity: 0; transition: opacity 0.18s; }
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .card:hover::before { opacity: 0.07; }
+  .card:active { transform: scale(0.96) translateY(0); }
+  .card-ico { width: 58px; height: 58px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; z-index: 1; }
+  .card-name { font-size: 12px; font-weight: 500; color: var(--text); text-align: center; line-height: 1.35; max-height: 50px; overflow: hidden; position: relative; z-index: 1; }
+  .card-tag { font-size: 10px; color: var(--text3); background: rgba(255,255,255,0.04); border-radius: 8px; padding: 2px 8px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; position: relative; z-index: 1; }
+  .empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-ico { font-size: 44px; display: block; margin-bottom: 14px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 0.5px solid var(--border2); border-radius: 20px; padding: 10px 20px; font-size: 13px; color: var(--text); z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app-wrap">
+  <header>
+    <div class="logo-mark">
+      <div class="logo-icon">📋</div>
+      <div>
+        <div class="logo-text">Relatórios</div>
+        <div class="logo-sub">Acesso rápido</div>
+      </div>
+    </div>
+    <div class="header-count" id="headerCount">0 links</div>
+  </header>
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" type="search" placeholder="Buscar relatório..." id="searchInput" oninput="render()">
+    </div>
+  </div>
+  <div class="cats" id="catTabs"></div>
+  <div class="count-row" id="countRow"></div>
+  <div class="grid" id="grid"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const LINKS_DATA = [
+  {
+    "id": "mmt1avv6c0i1",
+    "name": "SINISTROS FATAIS",
+    "url": "https://amcsupervisao.github.io/relatoriosinistrofatal_CEOPE_1.2/",
+    "category": "SINISTRO",
+    "emoji": "🚓",
+    "color": "#e84393"
+  },
+  {
+    "id": "mmt209taj7ij",
+    "name": "RELATÓRIO DE TURNO",
+    "url": "https://amcsupervisao.github.io/relatorioturno_CEOPE_3.2/",
+    "category": "DISTRIBUIÇÃO",
+    "emoji": "👮‍♀️",
+    "color": "#00b894"
+  },
+  {
+    "id": "mmt23kspuoj7",
+    "name": "CAPITAL LIMPA E ORDENADA",
+    "url": "https://ceopeamc.github.io/rel_capitallimpaordenada_1.3/",
+    "category": "FISCALIZAÇÃO",
+    "emoji": "🏙️",
+    "color": "#e17055"
+  },
+  {
+    "id": "mmt26j5oas7f",
+    "name": "CONTADOR",
+    "url": "https://amcsupervisao.github.io/contador_CEOPE_2.0/",
+    "category": "COMANDOS",
+    "emoji": "📈",
+    "color": "#fdcb6e"
+  },
+  {
+    "id": "mmt290b3tai4",
+    "name": "CICLOS/AUTOPROPELIDOS",
+    "url": "https://detran.sp.gov.br/ciclomotor/",
+    "category": "VEÍCULOS",
+    "emoji": "🛵",
+    "color": "#0984e3"
+  },
+  {
+    "id": "mmt2wrf6ra6o",
+    "name": "AET - MANUAL",
+    "url": "https://ceopeamc.github.io/AET_GERAL/",
+    "category": "AET",
+    "emoji": "📜",
+    "color": "#fd79a8"
+  },
+  {
+    "id": "mmt3aknjvfky",
+    "name": "AET - GUIA RÁPIDO",
+    "url": "https://ceopeamc.github.io/AET_RESUMO/",
+    "category": "AET",
+    "emoji": "📑",
+    "color": "#0984e3"
+  }
+];
+let activeCat = 'Todos';
+function getCategories() { return ['Todos', ...new Set(LINKS_DATA.map(l => l.category).filter(Boolean))]; }
+function filtered() {
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  return LINKS_DATA.filter(l => {
+    const matchCat = activeCat === 'Todos' || l.category === activeCat;
+    const matchQ = !q || l.name.toLowerCase().includes(q) || (l.category||'').toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+}
+function renderCats() {
+  const tabs = document.getElementById('catTabs');
+  tabs.innerHTML = getCategories().map(c => `<div class="cat-pill ${c===activeCat?'active':''}" data-cat="${esc(c)}">${esc(c)}</div>`).join('');
+  tabs.onclick = function(ev) {
+    const el = ev.target.closest('.cat-pill');
+    if (el) { activeCat = el.dataset.cat; renderCats(); render(); }
+  };
+}
+function render() {
+  const fl = filtered();
+  const grid = document.getElementById('grid');
+  document.getElementById('headerCount').textContent = LINKS_DATA.length + ' link' + (LINKS_DATA.length!==1?'s':'');
+  document.getElementById('countRow').textContent = fl.length + ' relatório' + (fl.length!==1?'s':'');
+  if (!fl.length) { grid.innerHTML = '<div class="empty"><span class="empty-ico">🔍</span><p>Nenhum relatório encontrado.</p></div>'; return; }
+  grid.innerHTML = fl.map(l => `<div class="card" style="--card-color:${l.color}" onclick="openLink('${esc(l.url)}','${esc(l.name)}')"><div class="card-ico" style="background:${l.color}22">${l.emoji}</div><div class="card-name">${esc(l.name)}</div>${l.category?`<div class="card-tag">${esc(l.category)}</div>`:''}</div>`).join('');
+}
+function openLink(url, name) { showToast('Abrindo '+name+'…'); setTimeout(()=>window.open(url,'_blank'),150); }
+function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._to); t._to=setTimeout(()=>t.classList.remove('show'),2000); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+renderCats(); render();
+</script>
+</body>
+</html>
