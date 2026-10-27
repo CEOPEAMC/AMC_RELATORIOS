@@ -487,7 +487,7 @@ const BACKUP = null;
     $('conteudo').innerHTML = grupos.map(g =>
       '<section>' + (titulos ? '<h2 class="sec">' + g.titulo + '</h2>' : '') +
       (g.tipo === 'cards'
-        ? '<div class="grid">' + g.itens.map(card).join('') + '</div><div class="list">' + g.itens.map(row).join('') + '</div>'
+        ? '<div class="grid">' + g.itens.map(card).join('') + '</div><div class="list">' + g.itens.map(l => row(l, false)).join('') + '</div>'
         : '<div class="sys">' + g.itens.map(l => row(l, true)).join('') + '</div>') +
       '</section>').join('');
   }
