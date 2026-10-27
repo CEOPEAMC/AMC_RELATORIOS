@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Central AMC</title>
+<meta name="description" content="Central AMC — CEOPE · Relatórios e sistemas da central">
+<meta name="theme-color" content="#F5F6F8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1015" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Central AMC">
+<link rel="manifest" href="./manifest-central.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<script>try{var t=localStorage.getItem('amc_rel_tema');if(t==='claro'||t==='escuro')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F5F6F8; --surface: #FFFFFF; --surface2: #EEF0F3;
+    --border: #E3E5EA; --border2: #C9CDD5;
+    --text: #16181D; --text2: #4B515C; --text3: #6B7180;
+    --accent: #F49932; --on-accent: #1C1D21; --focus: #2563EB;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
+    --shadow-hover: 0 8px 24px rgba(16,24,40,.10);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="claro"]) {
+      --bg: #0E1015; --surface: #171A21; --surface2: #1F232C;
+      --border: #262A33; --border2: #3A404C;
+      --text: #ECEEF2; --text2: #B4BAC6; --text3: #8E94A3;
+      --focus: #60A5FA;
+      --shadow: none; --shadow-hover: 0 8px 24px rgba(0,0,0,.45);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="escuro"] {
+    --bg: #0E1015; --surface: #171A21; --surface2: #1F232C;
+    --border: #262A33; --border2: #3A404C;
+    --text: #ECEEF2; --text2: #B4BAC6; --text3: #8E94A3;
+    --focus: #60A5FA;
+    --shadow: none; --shadow-hover: 0 8px 24px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); min-height: 100vh;
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 32px; }
+  @media (min-width: 720px) { .wrap { padding: 28px 28px 40px; } }
+
+  /* Cabeçalho */
+  header { display: flex; align-items: center; gap: 12px; padding: 4px 0 16px; }
+  .logo { width: 44px; height: 44px; flex-shrink: 0; object-fit: contain; }
+  .brand { flex: 1; min-width: 0; }
+  .brand h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.2; }
+  .brand p { font-size: 12.5px; color: var(--text2); margin-top: 2px; line-height: 1.35; }
+  .tools { display: flex; gap: 6px; flex-shrink: 0; }
+  .seg { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3px; gap: 2px; }
+  .seg .ibtn { width: 38px; height: 34px; }
+  .ibtn {
+    width: 38px; height: 34px; border: 0; border-radius: 9px; background: transparent; color: var(--text2);
+    display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s, color .15s;
+  }
+  .ibtn:hover { color: var(--text); background: var(--surface2); }
+  .ibtn[aria-pressed="true"] { background: var(--surface2); color: var(--text); }
+  .ibtn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .solo { background: var(--surface); border: 1px solid var(--border); width: 42px; height: 42px; border-radius: 12px; }
+
+  /* Busca */
+  .search { position: relative; }
+  .search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: none; stroke: var(--text3); stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+  .search input {
+    width: 100%; height: 46px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface);
+    padding: 0 14px 0 42px; font: inherit; font-size: 15px; color: var(--text); outline: none; -webkit-appearance: none; box-shadow: var(--shadow);
+    transition: border-color .15s;
+  }
+  .search input::placeholder { color: var(--text3); }
+  .search input:focus { border-color: var(--focus); }
+  .search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+  /* Filtros */
+  .cats { display: flex; gap: 8px; margin: 14px -16px 0; padding: 2px 16px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  @media (min-width: 720px) { .cats { margin: 14px 0 0; padding: 2px 0; flex-wrap: wrap; } }
+  .cats::-webkit-scrollbar { display: none; }
+  .pill {
+    flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text2); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s; white-space: nowrap;
+  }
+  .pill:hover { color: var(--text); border-color: var(--border2); }
+  .pill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 600; }
+
+  .meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--text2); margin: 14px 0 12px 2px; }
+
+  /* Grade */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); gap: 12px; }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr 1fr; gap: 10px; } }
+  .card {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+    padding: 18px 10px 16px; min-height: 148px; border-radius: 16px; background: var(--surface);
+    border: 1px solid var(--border); box-shadow: var(--shadow); color: inherit; text-decoration: none;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+  }
+  .card:hover { border-color: var(--border2); box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .card:active { transform: scale(.98); }
+  .tile { width: 62px; height: 62px; border-radius: 17px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .tile svg { width: 36px; height: 36px; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .tile .emo { font-size: 32px; line-height: 1; }
+  .name { font-size: 13px; font-weight: 600; line-height: 1.3; letter-spacing: .1px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .cat { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: .3px; margin-top: auto; }
+
+  /* Seções */
+  .sec { font-size: 12.5px; font-weight: 700; color: var(--text2); letter-spacing: .5px; text-transform: uppercase; margin: 26px 2px 10px; }
+  section:first-child .sec { margin-top: 4px; }
+  .sys { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 8px; }
+  .sys .row { padding: 10px 12px; gap: 12px; }
+  .sys .row .tile { width: 42px; height: 42px; border-radius: 12px; }
+  .sys .row .tile svg { width: 24px; height: 24px; }
+  .sys .row .name { font-size: 13.5px; }
+  .sys .aviso { margin-left: 0; }
+  .card-aviso { margin: -4px 0 0; }
+  .aviso { display: inline-block; font-size: 10.5px; font-weight: 600; letter-spacing: .2px; color: #92400E; background: #FEF3C7; border-radius: 6px; padding: 1px 7px; margin-left: 6px; text-transform: none; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="claro"]) .aviso { color: #FCD34D; background: rgba(245,158,11,.16); } }
+  :root[data-theme="escuro"] .aviso { color: #FCD34D; background: rgba(245,158,11,.16); }
+
+  /* Lista */
+  .list { display: none; flex-direction: column; gap: 8px; }
+  body.ver-lista .grid { display: none; }
+  body.ver-lista .list { display: flex; }
+  .row {
+    display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface);
+    border: 1px solid var(--border); box-shadow: var(--shadow); color: inherit; text-decoration: none; transition: border-color .15s, background .15s;
+  }
+  .row:hover { border-color: var(--border2); }
+  .row:active { background: var(--surface2); }
+  .row .tile { width: 48px; height: 48px; border-radius: 13px; }
+  .row .tile svg { width: 28px; height: 28px; }
+  .row .tile .emo { font-size: 22px; }
+  .row .txt { flex: 1; min-width: 0; }
+  .row .name { font-size: 14px; -webkit-line-clamp: 2; }
+  .row .cat { display: block; margin-top: 3px; }
+  .chev { width: 18px; height: 18px; fill: none; stroke: var(--text3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .empty { grid-column: 1 / -1; text-align: center; padding: 48px 16px; color: var(--text2); }
+  .empty svg { width: 36px; height: 36px; fill: none; stroke: var(--text3); stroke-width: 1.8; stroke-linecap: round; margin-bottom: 10px; }
+  .empty p { font-size: 14px; margin-bottom: 14px; }
+  .empty button { height: 36px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--border2); background: var(--surface); color: var(--text); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+
+  footer { text-align: center; font-size: 12px; color: var(--text3); padding: 28px 0 calc(8px + env(safe-area-inset-bottom)); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translate(-50%, 90px);
+    background: #1C1D21; color: #fff; font-size: 13px; padding: 10px 18px; border-radius: 999px; pointer-events: none;
+    transition: transform .25s ease; max-width: calc(100% - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 9;
+  }
+  .toast { opacity: 0; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="./logo-amc.png" alt="" width="44" height="44" onerror="this.style.display='none'">
+    <div class="brand">
+      <h1>Central AMC</h1>
+      <p>CEOPE · Relatórios e sistemas da central</p>
+    </div>
+    <div class="tools">
+      <button class="ibtn solo" id="btnTema" title="Tema" aria-label="Trocar tema"></button>
+    </div>
+  </header>
+
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l4.5 4.5"/></svg>
+    <input id="busca" type="search" placeholder="Buscar relatório ou sistema…" aria-label="Buscar" autocomplete="off">
+  </div>
+  <nav class="cats" id="cats" aria-label="Categorias"></nav>
+  <div class="meta"><span id="contagem"></span>
+<div class="seg" role="group" aria-label="Modo de exibição">
+        <button class="ibtn" id="btnGrade" aria-pressed="true" title="Grade" aria-label="Ver em grade"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg></button>
+        <button class="ibtn" id="btnLista" aria-pressed="false" title="Lista" aria-label="Ver em lista"><svg viewBox="0 0 24 24"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4.5 6h.01"/><path d="M4.5 12h.01"/><path d="M4.5 18h.01"/></svg></button>
+      </div>
+  </div>
+
+  <main id="conteudo"></main>
+
+  <footer>AMC · Trânsito e Cidadania · CEOPE<span id="atualizado"></span></footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const LINKS_DATA = [
+  {
+    "id": "mpybdr8b2vpj",
+    "name": "RELATÓRIO DE TURNO",
+    "url": "https://amcsupervisao.github.io/relatorioturno_CEOPE_3.2/",
+    "category": "DISTRIBUIÇÃO",
+    "icon": "agente",
+    "emoji": "👮",
+    "color": "#7C3AED",
+    "note": "",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-c10",
+    "name": "REMOTEVIEW (SAC)",
+    "url": "https://gatewayview.amc.fortaleza.ce.gov.br/#/",
+    "category": "CENTRAL",
+    "icon": "monitor",
+    "emoji": "",
+    "color": "#2563EB",
+    "note": "Só na rede interna",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-c01",
+    "name": "NETDISPATCHER (CIOPS)",
+    "url": "https://netd.sspds.ce.gov.br/NetDispatcher/Account/LogOn?ReturnUrl=%2fNetDispatcher%2fAccount%2f",
+    "category": "CENTRAL",
+    "icon": "radio",
+    "emoji": "",
+    "color": "#DC2626",
+    "note": "",
+    "sec": "cards"
+  },
+  {
+    "id": "mpzkqas3el1u",
+    "name": "RELATÓRIO SEMAFÓRICO",
+    "url": "https://crisstiano07.github.io/nit-nucleo-inteligencia-trafego/",
+    "category": "OPERAÇÃO",
+    "icon": "semaforo",
+    "emoji": "🚥",
+    "color": "#EA580C",
+    "note": "",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-c09",
+    "name": "SIGA VIDEOMONITORAMENTO",
+    "url": "http://www1.amc.fortaleza.ce.gov.br:81/videom/login.html",
+    "category": "CENTRAL",
+    "icon": "camera",
+    "emoji": "",
+    "color": "#0F766E",
+    "note": "Só na rede interna",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-c05",
+    "name": "SISTEMA DO PÁTIO",
+    "url": "https://patioamc.godocs.com.br/",
+    "category": "CENTRAL",
+    "icon": "carro",
+    "emoji": "",
+    "color": "#B45309",
+    "note": "",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-c04",
+    "name": "GPS – MAGNUS",
+    "url": "https://portal2.magnusti.com.br/Portal/Login",
+    "category": "CENTRAL",
+    "icon": "mapa",
+    "emoji": "",
+    "color": "#4F46E5",
+    "note": "",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-c03",
+    "name": "GPS – ITRACK",
+    "url": "https://www10.itrack.com.br/cfortegps/controlemonitoramento",
+    "category": "CENTRAL",
+    "icon": "pin",
+    "emoji": "",
+    "color": "#4F46E5",
+    "note": "",
+    "sec": "cards"
+  },
+  {
+    "id": "sis-s09",
+    "name": "RADAR SERPRO",
+    "url": "https://radar.serpro.gov.br/main.html#/login",
+    "category": "SISTEMAS",
+    "icon": "radar",
+    "emoji": "",
+    "color": "#0F766E",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-c07",
+    "name": "SIGAM",
+    "url": "https://sigam.amc.fortaleza.ce.gov.br/",
+    "category": "SISTEMAS",
+    "icon": "tabela",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-c02",
+    "name": "GODOCS – NOTIFICAÇÕES NO CELULAR",
+    "url": "https://amctransito.com.br/godocs/",
+    "category": "CENTRAL",
+    "icon": "celular",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-c06",
+    "name": "ZONA AZUL – CONSULTA",
+    "url": "https://zonaazuladm.centralamc.com.br/auth/login",
+    "category": "CENTRAL",
+    "icon": "estacionamento",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "mpzklpjv0jvq",
+    "name": "AUTORIZAÇÕES, RENDIÇÕES E ABASTECIMENTO",
+    "url": "https://ceopeamc.github.io/QRU_RENDICAO_TURNO/",
+    "category": "APOIO OPERACIONAL",
+    "icon": "prancheta",
+    "emoji": "🔃",
+    "color": "#DB2777",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "mpyk5z3wvszf",
+    "name": "CAPITAL LIMPA E ORDENADA",
+    "url": "https://ceopeamc.github.io/rel_capitallimpaordenada_1.3/",
+    "category": "FISCALIZAÇÃO",
+    "icon": "estrada",
+    "emoji": "🛣️",
+    "color": "#15803D",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "mpzkcb9qtnp5",
+    "name": "CONTADOR",
+    "url": "https://amcsupervisao.github.io/contador_CEOPE_2.0/",
+    "category": "FISCALIZAÇÃO",
+    "icon": "contador",
+    "emoji": "📈",
+    "color": "#15803D",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "mpzkou4a75zn",
+    "name": "OPERAÇÃO CASTELÃO",
+    "url": "https://amcsupervisao.github.io/operacao_castelao/",
+    "category": "OPERAÇÃO",
+    "icon": "estadio",
+    "emoji": "🚦",
+    "color": "#EA580C",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "mpzkg2cf5917",
+    "name": "AET - MANUAL",
+    "url": "https://ceopeamc.github.io/AET_GERAL/",
+    "category": "CONSULTAS",
+    "icon": "livro",
+    "emoji": "🚛",
+    "color": "#2563EB",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "mpzkinb5j895",
+    "name": "AET - GUIA RÁPIDO",
+    "url": "https://ceopeamc.github.io/AET_RESUMO/",
+    "category": "CONSULTAS",
+    "icon": "caminhao",
+    "emoji": "🚛",
+    "color": "#2563EB",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s04",
+    "name": "SITE DA AMC",
+    "url": "https://amctransito.com.br/",
+    "category": "SISTEMAS",
+    "icon": "casa",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s05",
+    "name": "CI ELETRÔNICA",
+    "url": "https://scc.amc.fortaleza.ce.gov.br",
+    "category": "SISTEMAS",
+    "icon": "megafone",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s06",
+    "name": "E-BAT AGENTE",
+    "url": "https://ebat.amc.fortaleza.ce.gov.br/agent",
+    "category": "SISTEMAS",
+    "icon": "alerta",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s08",
+    "name": "GUARDIÃO (PONTO)",
+    "url": "http://sistemas.sepog.fortaleza.ce.gov.br/guardiao/index.aspx",
+    "category": "SISTEMAS",
+    "icon": "relogio",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s03",
+    "name": "E-MAIL INSTITUCIONAL (ZIMBRA)",
+    "url": "https://webmail.fortaleza.ce.gov.br/",
+    "category": "SISTEMAS",
+    "icon": "email",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s07",
+    "name": "SPU VIRTUAL (ABERTURA DE PROCESSOS)",
+    "url": "https://spuvirtual.sepog.fortaleza.ce.gov.br/",
+    "category": "SISTEMAS",
+    "icon": "pasta",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s02",
+    "name": "SINESP (CURSOS)",
+    "url": "https://seguranca.sinesp.gov.br/sinesp-seguranca/login.jsf?goto=CADASTROS",
+    "category": "SISTEMAS",
+    "icon": "lupa",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-s01",
+    "name": "PORTAL DE SERVIÇOS SENATRAN",
+    "url": "https://portalservicos.senatran.serpro.gov.br/#/home",
+    "category": "SISTEMAS",
+    "icon": "globo",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  },
+  {
+    "id": "sis-c08",
+    "name": "E-BAT ADMIN",
+    "url": "https://ebat.amc.fortaleza.ce.gov.br/admin/login",
+    "category": "CENTRAL",
+    "icon": "engrenagem",
+    "emoji": "",
+    "color": "#475569",
+    "note": "",
+    "sec": "lista"
+  }
+];
+const ICONS = {
+  "agente": "\u003cpath d=\"M12 1.8l9 3.5v6.2c0 5.5-3.8 9.5-9 11.3-5.2-1.8-9-5.8-9-11.3V5.3z\"/>\u003ccircle cx=\"12\" cy=\"9.4\" r=\"3.3\"/>\u003cpath d=\"M6.6 17.8c1.2-2.4 3.1-3.6 5.4-3.6s4.2 1.2 5.4 3.6\"/>",
+  "monitor": "\u003crect x=\"3\" y=\"4\" width=\"18\" height=\"12.5\" rx=\"2\"/>\u003cpath d=\"M8.5 20.5h7\"/>\u003cpath d=\"M12 16.5v4\"/>",
+  "radio": "\u003crect x=\"6\" y=\"8\" width=\"12\" height=\"13\" rx=\"2\"/>\u003cpath d=\"M9 8L8 3\"/>\u003cpath d=\"M9.5 12.5h5\"/>\u003ccircle cx=\"12\" cy=\"17\" r=\"1.4\"/>",
+  "semaforo": "\u003crect x=\"8\" y=\"2.5\" width=\"8\" height=\"16\" rx=\"3\"/>\u003ccircle cx=\"12\" cy=\"6.5\" r=\"1.3\"/>\u003ccircle cx=\"12\" cy=\"10.5\" r=\"1.3\"/>\u003ccircle cx=\"12\" cy=\"14.5\" r=\"1.3\"/>\u003cpath d=\"M12 18.5V22\"/>",
+  "camera": "\u003cpath d=\"M4 8h3l1.6-2.5h6.8L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z\"/>\u003ccircle cx=\"12\" cy=\"13\" r=\"3.4\"/>",
+  "carro": "\u003cpath d=\"M5 11l1.6-4.4A2 2 0 018.5 5.3h7a2 2 0 011.9 1.3L19 11\"/>\u003crect x=\"3\" y=\"11\" width=\"18\" height=\"6\" rx=\"2\"/>\u003cpath d=\"M5.5 17v2\"/>\u003cpath d=\"M18.5 17v2\"/>\u003ccircle cx=\"7.5\" cy=\"14\" r=\".6\"/>\u003ccircle cx=\"16.5\" cy=\"14\" r=\".6\"/>",
+  "mapa": "\u003cpath d=\"M3.5 6.5l5.5-2.5 6 2.5 5.5-2.5v13.5l-5.5 2.5-6-2.5-5.5 2.5z\"/>\u003cpath d=\"M9 4v13.5\"/>\u003cpath d=\"M15 6.5V20\"/>",
+  "pin": "\u003cpath d=\"M12 21s-6.5-6-6.5-11a6.5 6.5 0 0113 0c0 5-6.5 11-6.5 11z\"/>\u003ccircle cx=\"12\" cy=\"10\" r=\"2.4\"/>",
+  "radar": "\u003ccircle cx=\"12\" cy=\"12\" r=\"8.5\"/>\u003ccircle cx=\"12\" cy=\"12\" r=\"4.5\"/>\u003cpath d=\"M12 12l5.5-5.5\"/>\u003ccircle cx=\"12\" cy=\"12\" r=\".8\"/>",
+  "tabela": "\u003crect x=\"3.5\" y=\"4\" width=\"17\" height=\"16\" rx=\"2\"/>\u003cpath d=\"M3.5 9.5h17\"/>\u003cpath d=\"M3.5 14.5h17\"/>\u003cpath d=\"M9.5 9.5V20\"/>",
+  "celular": "\u003crect x=\"6.5\" y=\"2.5\" width=\"11\" height=\"19\" rx=\"2.5\"/>\u003cpath d=\"M10.5 18.5h3\"/>",
+  "estacionamento": "\u003crect x=\"3.5\" y=\"3.5\" width=\"17\" height=\"17\" rx=\"3\"/>\u003cpath d=\"M9.5 17V7h3.5a3 3 0 010 6H9.5\"/>",
+  "prancheta": "\u003crect x=\"5\" y=\"4.5\" width=\"14\" height=\"16.5\" rx=\"2\"/>\u003crect x=\"9\" y=\"3\" width=\"6\" height=\"3\" rx=\"1\"/>\u003cpath d=\"M9 12l2 2 4-4\"/>\u003cpath d=\"M9 17.5h6\"/>",
+  "estrada": "\u003cpath d=\"M6 21L9.5 3\"/>\u003cpath d=\"M18 21L14.5 3\"/>\u003cpath d=\"M12 5v2\"/>\u003cpath d=\"M12 11v2\"/>\u003cpath d=\"M12 17v2.5\"/>",
+  "contador": "\u003cpath d=\"M6 5v14\"/>\u003cpath d=\"M10 5v14\"/>\u003cpath d=\"M14 5v14\"/>\u003cpath d=\"M18 5v14\"/>\u003cpath d=\"M3.5 16.5l17-9\"/>",
+  "estadio": "\u003cellipse cx=\"12\" cy=\"8\" rx=\"9.5\" ry=\"4\"/>\u003cpath d=\"M2.5 8v7.5c0 2.2 4.3 4 9.5 4s9.5-1.8 9.5-4V8\"/>\u003cpath d=\"M7.5 11.6v7.4\"/>\u003cpath d=\"M16.5 11.6v7.4\"/>",
+  "livro": "\u003cpath d=\"M5 4.5A1.5 1.5 0 016.5 3H19v15H6.5A1.5 1.5 0 005 19.5z\"/>\u003cpath d=\"M5 19.5A1.5 1.5 0 006.5 21H19v-3\"/>\u003cpath d=\"M9 7.5h6\"/>",
+  "caminhao": "\u003cpath d=\"M2.5 6h11.5v10H2.5z\"/>\u003cpath d=\"M14 9.5h4l3.5 3.5V16H14\"/>\u003ccircle cx=\"6.5\" cy=\"17.5\" r=\"1.9\"/>\u003ccircle cx=\"17.5\" cy=\"17.5\" r=\"1.9\"/>",
+  "casa": "\u003cpath d=\"M3.5 11L12 4l8.5 7\"/>\u003cpath d=\"M5.5 9.5V20h13V9.5\"/>\u003cpath d=\"M10 20v-5.5h4V20\"/>",
+  "megafone": "\u003cpath d=\"M4 10v4a1 1 0 001 1h2l7 4.5v-15L7 9H5a1 1 0 00-1 1z\"/>\u003cpath d=\"M17.5 9a4 4 0 010 6\"/>\u003cpath d=\"M8 15.5l1 4.5\"/>",
+  "alerta": "\u003cpath d=\"M10.3 4.2L2.8 17.5A2 2 0 004.5 20.5h15a2 2 0 001.7-3L13.7 4.2a2 2 0 00-3.4 0z\"/>\u003cpath d=\"M12 9.5v4\"/>\u003cpath d=\"M12 17h.01\"/>",
+  "relogio": "\u003ccircle cx=\"12\" cy=\"12\" r=\"8.5\"/>\u003cpath d=\"M12 7.5V12l3 2\"/>",
+  "email": "\u003crect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2.5\"/>\u003cpath d=\"M3.5 7l8.5 6 8.5-6\"/>",
+  "pasta": "\u003cpath d=\"M3.5 6.5a1.5 1.5 0 011.5-1.5h4.3l2 2.5H19a1.5 1.5 0 011.5 1.5v9a1.5 1.5 0 01-1.5 1.5H5a1.5 1.5 0 01-1.5-1.5z\"/>",
+  "lupa": "\u003ccircle cx=\"10.5\" cy=\"10.5\" r=\"6\"/>\u003cpath d=\"M15 15l5.5 5.5\"/>",
+  "globo": "\u003ccircle cx=\"12\" cy=\"12\" r=\"8.5\"/>\u003cpath d=\"M3.5 12h17\"/>\u003cpath d=\"M12 3.5c2.4 2.4 3.5 5.3 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.3-3.5-8.5s1.1-6.1 3.5-8.5z\"/>",
+  "engrenagem": "\u003ccircle cx=\"12\" cy=\"12\" r=\"3\"/>\u003cpath d=\"M12 2.8v2.4\"/>\u003cpath d=\"M12 18.8v2.4\"/>\u003cpath d=\"M2.8 12h2.4\"/>\u003cpath d=\"M18.8 12h2.4\"/>\u003cpath d=\"M5.5 5.5l1.7 1.7\"/>\u003cpath d=\"M16.8 16.8l1.7 1.7\"/>\u003cpath d=\"M5.5 18.5l1.7-1.7\"/>\u003cpath d=\"M16.8 7.2l1.7-1.7\"/>\u003ccircle cx=\"12\" cy=\"12\" r=\"6.3\"/>"
+};
+const APP_CONFIG = {"page":"central","defaultView":"grade","generated":"27/10/2026","secoes":{"cards":"Principais","lista":"Sistemas e portais","exclusivos":"Exclusivos da central"}};
+const BACKUP = {"formato":"relatorios-amc","versao":3,"ajustes":{"title":"Relatórios AMC","subtitle":"CEOPE · Trânsito e Cidadania","defaultView":"grade","centralTitle":"Central AMC","centralSubtitle":"CEOPE · Relatórios e sistemas da central","gradeAgentes":"Relatórios CEOPE","gradeCentral":"Principais"},"ordem":{"agentes":["mpybdr8b2vpj","mpzklpjv0jvq","mpyk5z3wvszf","mpzkcb9qtnp5","mpzkou4a75zn","sis-s09","mpzkg2cf5917","mpzkinb5j895","sis-s04","sis-s05","sis-s06","sis-s08","sis-s03","sis-s07","sis-c07","sis-s02","sis-s01","mpzkqas3el1u","sis-c10","sis-c01","sis-c09","sis-c05","sis-c04","sis-c03","sis-c02","sis-c06","sis-c08"],"central":["mpybdr8b2vpj","sis-c10","sis-c01","mpzkqas3el1u","sis-c09","sis-c05","sis-c04","sis-c03","sis-s09","sis-c07","sis-c02","sis-c06","mpzklpjv0jvq","mpyk5z3wvszf","mpzkcb9qtnp5","mpzkou4a75zn","mpzkg2cf5917","mpzkinb5j895","sis-s04","sis-s05","sis-s06","sis-s08","sis-s03","sis-s07","sis-s02","sis-s01","sis-c08"]},"links":[{"id":"mpybdr8b2vpj","name":"RELATÓRIO DE TURNO","url":"https://amcsupervisao.github.io/relatorioturno_CEOPE_3.2/","category":"DISTRIBUIÇÃO","icon":"agente","emoji":"👮","color":"#7C3AED","note":"","place":{"agentes":"cards","central":"cards"}},{"id":"mpzklpjv0jvq","name":"AUTORIZAÇÕES, RENDIÇÕES E ABASTECIMENTO","url":"https://ceopeamc.github.io/QRU_RENDICAO_TURNO/","category":"APOIO OPERACIONAL","icon":"prancheta","emoji":"🔃","color":"#DB2777","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"mpyk5z3wvszf","name":"CAPITAL LIMPA E ORDENADA","url":"https://ceopeamc.github.io/rel_capitallimpaordenada_1.3/","category":"FISCALIZAÇÃO","icon":"estrada","emoji":"🛣️","color":"#15803D","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"mpzkcb9qtnp5","name":"CONTADOR","url":"https://amcsupervisao.github.io/contador_CEOPE_2.0/","category":"FISCALIZAÇÃO","icon":"contador","emoji":"📈","color":"#15803D","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"mpzkou4a75zn","name":"OPERAÇÃO CASTELÃO","url":"https://amcsupervisao.github.io/operacao_castelao/","category":"OPERAÇÃO","icon":"estadio","emoji":"🚦","color":"#EA580C","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"sis-s09","name":"RADAR SERPRO","url":"https://radar.serpro.gov.br/main.html#/login","category":"SISTEMAS","icon":"radar","emoji":"","color":"#0F766E","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"mpzkg2cf5917","name":"AET - MANUAL","url":"https://ceopeamc.github.io/AET_GERAL/","category":"CONSULTAS","icon":"livro","emoji":"🚛","color":"#2563EB","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"mpzkinb5j895","name":"AET - GUIA RÁPIDO","url":"https://ceopeamc.github.io/AET_RESUMO/","category":"CONSULTAS","icon":"caminhao","emoji":"🚛","color":"#2563EB","note":"","place":{"agentes":"cards","central":"lista"}},{"id":"sis-s04","name":"SITE DA AMC","url":"https://amctransito.com.br/","category":"SISTEMAS","icon":"casa","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s05","name":"CI ELETRÔNICA","url":"https://scc.amc.fortaleza.ce.gov.br","category":"SISTEMAS","icon":"megafone","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s06","name":"E-BAT AGENTE","url":"https://ebat.amc.fortaleza.ce.gov.br/agent","category":"SISTEMAS","icon":"alerta","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s08","name":"GUARDIÃO (PONTO)","url":"http://sistemas.sepog.fortaleza.ce.gov.br/guardiao/index.aspx","category":"SISTEMAS","icon":"relogio","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s03","name":"E-MAIL INSTITUCIONAL (ZIMBRA)","url":"https://webmail.fortaleza.ce.gov.br/","category":"SISTEMAS","icon":"email","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s07","name":"SPU VIRTUAL (ABERTURA DE PROCESSOS)","url":"https://spuvirtual.sepog.fortaleza.ce.gov.br/","category":"SISTEMAS","icon":"pasta","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-c07","name":"SIGAM","url":"https://sigam.amc.fortaleza.ce.gov.br/","category":"SISTEMAS","icon":"tabela","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s02","name":"SINESP (CURSOS)","url":"https://seguranca.sinesp.gov.br/sinesp-seguranca/login.jsf?goto=CADASTROS","category":"SISTEMAS","icon":"lupa","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"sis-s01","name":"PORTAL DE SERVIÇOS SENATRAN","url":"https://portalservicos.senatran.serpro.gov.br/#/home","category":"SISTEMAS","icon":"globo","emoji":"","color":"#475569","note":"","place":{"agentes":"lista","central":"lista"}},{"id":"mpzkqas3el1u","name":"RELATÓRIO SEMAFÓRICO","url":"https://crisstiano07.github.io/nit-nucleo-inteligencia-trafego/","category":"OPERAÇÃO","icon":"semaforo","emoji":"🚥","color":"#EA580C","note":"","place":{"agentes":"","central":"cards"}},{"id":"sis-c10","name":"REMOTEVIEW (SAC)","url":"https://gatewayview.amc.fortaleza.ce.gov.br/#/","category":"CENTRAL","icon":"monitor","emoji":"","color":"#2563EB","note":"Só na rede interna","place":{"agentes":"","central":"cards"}},{"id":"sis-c01","name":"NETDISPATCHER (CIOPS)","url":"https://netd.sspds.ce.gov.br/NetDispatcher/Account/LogOn?ReturnUrl=%2fNetDispatcher%2fAccount%2f","category":"CENTRAL","icon":"radio","emoji":"","color":"#DC2626","note":"","place":{"agentes":"","central":"cards"}},{"id":"sis-c09","name":"SIGA VIDEOMONITORAMENTO","url":"http://www1.amc.fortaleza.ce.gov.br:81/videom/login.html","category":"CENTRAL","icon":"camera","emoji":"","color":"#0F766E","note":"Só na rede interna","place":{"agentes":"","central":"cards"}},{"id":"sis-c05","name":"SISTEMA DO PÁTIO","url":"https://patioamc.godocs.com.br/","category":"CENTRAL","icon":"carro","emoji":"","color":"#B45309","note":"","place":{"agentes":"","central":"cards"}},{"id":"sis-c04","name":"GPS – MAGNUS","url":"https://portal2.magnusti.com.br/Portal/Login","category":"CENTRAL","icon":"mapa","emoji":"","color":"#4F46E5","note":"","place":{"agentes":"","central":"cards"}},{"id":"sis-c03","name":"GPS – ITRACK","url":"https://www10.itrack.com.br/cfortegps/controlemonitoramento","category":"CENTRAL","icon":"pin","emoji":"","color":"#4F46E5","note":"","place":{"agentes":"","central":"cards"}},{"id":"sis-c02","name":"GODOCS – NOTIFICAÇÕES NO CELULAR","url":"https://amctransito.com.br/godocs/","category":"CENTRAL","icon":"celular","emoji":"","color":"#475569","note":"","place":{"agentes":"","central":"lista"}},{"id":"sis-c06","name":"ZONA AZUL – CONSULTA","url":"https://zonaazuladm.centralamc.com.br/auth/login","category":"CENTRAL","icon":"estacionamento","emoji":"","color":"#475569","note":"","place":{"agentes":"","central":"lista"}},{"id":"sis-c08","name":"E-BAT ADMIN","url":"https://ebat.amc.fortaleza.ce.gov.br/admin/login","category":"CENTRAL","icon":"engrenagem","emoji":"","color":"#475569","note":"","place":{"agentes":"","central":"lista"}}]};
+
+(function () {
+  const $ = id => document.getElementById(id);
+  let categoria = 'Todos';
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  };
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  function cor(c) { return /^#[0-9a-f]{6}$/i.test(c || '') ? c : '#475569'; }
+  function tinta(hex) {
+    const n = parseInt(hex.slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255;
+    const L = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); };
+    return (0.2126 * L(r) + 0.7152 * L(g) + 0.0722 * L(b)) > 0.45 ? '#1C1D21' : '#FFFFFF';
+  }
+  function tile(l, cinza) {
+    const c = cinza ? '#475569' : cor(l.color), ink = tinta(c);
+    const inner = ICONS[l.icon]
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true" style="stroke:' + ink + '">' + ICONS[l.icon] + '</svg>'
+      : '<span class="emo" aria-hidden="true">' + esc(l.emoji || '🔗') + '</span>';
+    return '<span class="tile" style="background:' + c + '">' + inner + '</span>';
+  }
+
+  function categorias() {
+    const vistas = [];
+    LINKS_DATA.forEach(l => { if (l.category && vistas.indexOf(l.category) < 0) vistas.push(l.category); });
+    return ['Todos'].concat(vistas);
+  }
+  function filtrados() {
+    const q = norm($('busca').value.trim());
+    return LINKS_DATA.filter(l =>
+      (categoria === 'Todos' || l.category === categoria) &&
+      (!q || norm(l.name).includes(q) || norm(l.category).includes(q) || norm(l.note).includes(q)));
+  }
+
+  function renderCats() {
+    $('cats').innerHTML = categorias().map(c =>
+      '<button class="pill" type="button" data-cat="' + esc(c) + '" aria-pressed="' + (c === categoria) + '">' + esc(c) + '</button>').join('');
+  }
+  const SEC = APP_CONFIG.secoes || {};
+  const TEM_SISTEMAS = LINKS_DATA.some(l => l.sec && l.sec !== 'cards');
+  const GRUPOS = [
+    { titulo: SEC.cards || 'Relatórios', f: l => !l.sec || l.sec === 'cards', tipo: 'cards' },
+    { titulo: SEC.lista || 'Sistemas e portais', f: l => l.sec === 'lista', tipo: 'sys' },
+    { titulo: SEC.exclusivos || 'Exclusivos da central', f: l => l.sec === 'exclusivos', tipo: 'sys' }
+  ];
+  // Palavras muito longas podem quebrar antes das 5 últimas letras (ex.: VIDEOMONITORA-MENTO)
+  function quebra(s) { return s.replace(/[^\s&;]{14,}/g, w => w.slice(0, -5) + '\u00AD' + w.slice(-5)); }
+  function card(l) {
+    return '<a class="card" href="' + esc(l.url) + '" target="_blank" rel="noopener" data-nome="' + esc(l.name) + '">' +
+      tile(l) + '<span class="name">' + quebra(esc(l.name)) + '</span>' +
+      (l.category ? '<span class="cat">' + esc(l.category) + '</span>' : '') +
+      (l.note ? '<span class="aviso card-aviso">' + esc(l.note) + '</span>' : '') + '</a>';
+  }
+  function row(l, semCat) {
+    const sub = (l.category && !semCat ? esc(l.category) : '') + (l.note ? '<span class="aviso">' + esc(l.note) + '</span>' : '');
+    return '<a class="row" href="' + esc(l.url) + '" target="_blank" rel="noopener" data-nome="' + esc(l.name) + '">' +
+      tile(l, semCat) + '<span class="txt"><span class="name">' + esc(l.name) + '</span>' +
+      (sub ? '<span class="cat">' + sub + '</span>' : '') + '</span>' +
+      '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>';
+  }
+  function render() {
+    const fl = filtrados();
+    const palavra = TEM_SISTEMAS ? (fl.length === 1 ? ' link' : ' links') : (fl.length === 1 ? ' relatório' : ' relatórios');
+    $('contagem').textContent = fl.length + palavra;
+    if (!fl.length) {
+      $('conteudo').innerHTML = '<div class="empty"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l4.5 4.5"/></svg><p>Nada encontrado.</p><button type="button" id="limpar">Limpar busca</button></div>';
+      return;
+    }
+    const grupos = GRUPOS.map(g => Object.assign({ itens: fl.filter(g.f) }, g)).filter(g => g.itens.length);
+    const titulos = grupos.length > 1 || TEM_SISTEMAS;
+    $('conteudo').innerHTML = grupos.map(g =>
+      '<section>' + (titulos ? '<h2 class="sec">' + g.titulo + '</h2>' : '') +
+      (g.tipo === 'cards'
+        ? '<div class="grid">' + g.itens.map(card).join('') + '</div><div class="list">' + g.itens.map(row).join('') + '</div>'
+        : '<div class="sys">' + g.itens.map(l => row(l, true)).join('') + '</div>') +
+      '</section>').join('');
+  }
+
+  function setView(v, salvar) {
+    document.body.classList.toggle('ver-lista', v === 'lista');
+    $('btnGrade').setAttribute('aria-pressed', v !== 'lista');
+    $('btnLista').setAttribute('aria-pressed', v === 'lista');
+    if (salvar) store.set('amc_rel_view', v);
+  }
+
+  const TEMAS = ['auto', 'claro', 'escuro'];
+  const ICO_TEMA = {
+    auto: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 010 16z" fill="currentColor"/></svg>',
+    claro: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2"/><path d="M12 19.5v2"/><path d="M2.5 12h2"/><path d="M19.5 12h2"/><path d="M5.3 5.3l1.4 1.4"/><path d="M17.3 17.3l1.4 1.4"/><path d="M5.3 18.7l1.4-1.4"/><path d="M17.3 6.7l1.4-1.4"/></svg>',
+    escuro: '<svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg>'
+  };
+  const NOME_TEMA = { auto: 'Tema: automático', claro: 'Tema: claro', escuro: 'Tema: escuro' };
+  function aplicarTema(t) {
+    if (t === 'auto') document.documentElement.removeAttribute('data-theme');
+    else document.documentElement.setAttribute('data-theme', t);
+    $('btnTema').innerHTML = ICO_TEMA[t];
+    $('btnTema').title = NOME_TEMA[t];
+    $('btnTema').setAttribute('aria-label', NOME_TEMA[t] + ' (tocar para trocar)');
+    const escuro = t === 'escuro' || (t === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      if (t === 'auto') m.setAttribute('content', m.media.indexOf('dark') >= 0 ? '#0E1015' : '#F5F6F8');
+      else m.setAttribute('content', escuro ? '#0E1015' : '#F5F6F8');
+    });
+  }
+
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  $('cats').addEventListener('click', e => {
+    const b = e.target.closest('.pill'); if (!b) return;
+    categoria = b.dataset.cat; renderCats(); render();
+  });
+  $('busca').addEventListener('input', render);
+  document.addEventListener('click', e => {
+    if (e.target.id === 'limpar') { $('busca').value = ''; categoria = 'Todos'; renderCats(); render(); $('busca').focus(); return; }
+    const a = e.target.closest('a[data-nome]'); if (a) toast('Abrindo ' + a.dataset.nome + '…');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== $('busca')) { e.preventDefault(); $('busca').focus(); }
+  });
+  $('btnGrade').addEventListener('click', () => setView('grade', true));
+  $('btnLista').addEventListener('click', () => setView('lista', true));
+  $('btnTema').addEventListener('click', () => {
+    const atual = store.get('amc_rel_tema') || 'auto';
+    const prox = TEMAS[(TEMAS.indexOf(atual) + 1) % TEMAS.length];
+    store.set('amc_rel_tema', prox); aplicarTema(prox); toast(NOME_TEMA[prox]);
+  });
+
+  if (APP_CONFIG.generated) $('atualizado').textContent = ' · atualizado em ' + APP_CONFIG.generated;
+  aplicarTema(store.get('amc_rel_tema') || 'auto');
+  setView(store.get('amc_rel_view') || APP_CONFIG.defaultView || 'grade', false);
+  renderCats(); render();
+})();
+</script>
+</body>
+</html>

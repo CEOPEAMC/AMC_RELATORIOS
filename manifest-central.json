@@ -1,0 +1,21 @@
+{
+  "id": "./central.html",
+  "name": "Central AMC",
+  "short_name": "Central AMC",
+  "description": "Relatórios e sistemas da central — AMC Trânsito e Cidadania",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./central.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFFFFF",
+  "theme_color": "#F5F6F8",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
